@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hub Admin - Логин мен Пароль Басқару</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00aaff;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #ccc;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #333;
+            background: #2a2a2a;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        input:focus {
+            border-color: #00aaff;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #00aaff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #0088cc;
+        }
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Хубқа Логин Қосу</h2>
+        <div class="input-group">
+            <label for="username">Логин:</label>
+            <input type="text" id="username" placeholder="Пайдаланушы аты">
+        </div>
+        <div class="input-group">
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" placeholder="Құпия сөз">
+        </div>
+        <button onclick="addUser()">Қосу / Сақтау</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // Сіздің Firebase Realtime Database сілтемеңіз
+        const FIREBASE_URL = "https://play-lag-default-rtdb.firebaseio.com/Usuarios";
+
+        async function addUser() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const messageDiv = document.getElementById('message');
+
+            if (!username || !password) {
+                messageDiv.style.color = "#ff4d4d";
+                messageDiv.innerText = "Барлық өрісті толтырыңыз!";
+                return;
+            }
+
+            messageDiv.style.color = "#ffcc00";
+            messageDiv.innerText = "Сақталуда...";
+
+            // Firebase-ге деректерді жіберу (PUT әдісі арқылы сол логин астына жазады)
+            try {
+                const response = await fetch(`${FIREBASE_URL}/${username}.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ Password: password })
+                });
+
+                if (response.ok) {
+                    messageDiv.style.color = "#4bb543";
+                    messageDiv.innerText = "Сәтті сақталды! Енді ойыннан кіре аласыз.";
+                    document.getElementById('username').value = '';
+                    document.getElementById('password').value = '';
+                } else {
+                    throw new Error("Қате орын алды");
+                }
+            } catch (error) {
+                messageDiv.style.color = "#ff4d4d";
+                messageDiv.innerText = "Қате: Интернетті тексеріңіз.";
+            }
+        }
+    </script>
+
+</body>
+</html>
